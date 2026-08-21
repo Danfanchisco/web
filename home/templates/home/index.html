@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: start center;
+            padding-top: 14vh;
+            background: #1464d2;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        body.off {
+            background: #26364d;
+        }
+
+        main {
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 6vw, 4rem);
+        }
+
+        .login-button {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            padding: 7px 12px;
+            border-radius: 6px;
+            background: white;
+            color: #1464d2;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .power-button {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border: 0;
+            border-radius: 6px;
+            background: white;
+            color: #1464d2;
+            cursor: pointer;
+            font: 700 0.8rem Arial, sans-serif;
+        }
+
+        .power-button.off {
+            color: #26364d;
+        }
+
+        .power-status {
+            position: fixed;
+            top: 58px;
+            right: 24px;
+            margin: 0;
+            color: white;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Welcome</h1>
+        {% if user.is_authenticated %}
+            <a class="login-button" href="#">{{ user.get_full_name|default:user.username }}</a>
+        {% else %}
+            <a class="login-button" href="/login/">Login</a>
+        {% endif %}
+    </main>
+    <button class="power-button" type="button" aria-pressed="true">
+        <span aria-hidden="true">●</span>
+        <span class="power-label">On</span>
+    </button>
+    <p class="power-status" role="status">Ready</p>
+    <script>
+        const powerButton = document.querySelector('.power-button');
+        const powerLabel = document.querySelector('.power-label');
+        const powerStatus = document.querySelector('.power-status');
+
+        powerButton.addEventListener('click', async () => {
+            const state = powerButton.classList.contains('off') ? 'on' : 'off';
+            powerStatus.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/api/power/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({state})
+                });
+
+                if (!response.ok) {
+                    throw new Error('Power request failed');
+                }
+
+                const result = await response.json();
+                const isOff = result.state === 'off';
+                document.body.classList.toggle('off', isOff);
+                powerButton.classList.toggle('off', isOff);
+                powerButton.setAttribute('aria-pressed', String(!isOff));
+                powerLabel.textContent = isOff ? 'Off' : 'On';
+                powerStatus.textContent = 'Connected';
+            } catch (error) {
+                powerStatus.textContent = 'Connection failed';
+            }
+        });
+    </script>
+</body>
+
+</html>

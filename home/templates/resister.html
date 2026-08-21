@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create account</title>
+    <style>
+        :root {
+            --ink: #172321;
+            --muted: #6d7b78;
+            --line: #dce5e1;
+            --paper: #fbfdfb;
+            --mint: #b8f2d6;
+            --green: #1c7252;
+            --green-dark: #14533d;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: #e8f0eb;
+            color: var(--ink);
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
+        .register-shell {
+            display: grid;
+            grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+            width: min(100%, 900px);
+            min-height: 600px;
+            overflow: hidden;
+            background: var(--paper);
+            border: 1px solid rgba(23, 35, 33, 0.1);
+            box-shadow: 0 26px 70px rgba(23, 35, 33, 0.15);
+        }
+
+        .intro {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 42px;
+            background: var(--ink);
+            color: white;
+        }
+
+        .intro-copy { max-width: 280px; }
+        .intro h1 { margin: 0 0 16px; font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: 0.98; }
+        .intro p { margin: 0; color: #b9c8c3; font-size: 1rem; line-height: 1.6; }
+        .quote { margin: 0; color: var(--mint); font-size: 0.9rem; line-height: 1.5; }
+
+        .form-panel {
+            display: flex;
+            align-items: center;
+            padding: 48px clamp(28px, 7vw, 76px);
+        }
+
+        .form-content { width: 100%; max-width: 340px; margin: 0 auto; }
+        .eyebrow { margin: 0 0 10px; color: var(--green); font: 700 0.75rem Arial, sans-serif; letter-spacing: 0.13em; text-transform: uppercase; }
+        .form-content h2 { margin: 0 0 10px; font-size: 2.2rem; }
+        .subtext { margin: 0 0 30px; color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+        .error { margin: -12px 0 4px; color: #a33a3a; font: 0.82rem Arial, sans-serif; }
+        form { display: grid; gap: 16px; }
+        label { display: grid; gap: 8px; font: 700 0.82rem Arial, sans-serif; }
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: white;
+            color: var(--ink);
+            font: 1rem Georgia, 'Times New Roman', serif;
+        }
+        input:focus { outline: 2px solid var(--mint); outline-offset: 2px; border-color: var(--green); }
+        .terms { display: flex; align-items: flex-start; gap: 8px; color: var(--muted); font: 0.78rem/1.4 Arial, sans-serif; }
+        .terms input { width: auto; margin-top: 2px; accent-color: var(--green); }
+        .terms a, .signin a { color: var(--green); font-weight: 700; text-decoration: none; }
+        .terms a:hover, .signin a:hover { text-decoration: underline; }
+        button {
+            margin-top: 4px;
+            padding: 15px;
+            border: 0;
+            border-radius: 5px;
+            background: var(--green);
+            color: white;
+            cursor: pointer;
+            font: 700 0.95rem Arial, sans-serif;
+        }
+        button:hover { background: var(--green-dark); }
+        .signin { margin: 26px 0 0; color: var(--muted); font: 0.82rem Arial, sans-serif; text-align: center; }
+
+        @media (max-width: 700px) {
+            body { padding: 0; }
+            .register-shell { grid-template-columns: 1fr; min-height: 100vh; border: 0; }
+            .intro { min-height: 260px; padding: 30px; }
+            .quote { display: none; }
+            .form-panel { padding: 40px 30px 52px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="register-shell">
+        <section class="intro">
+            <div class="intro-copy">
+                <h1>Start something good.</h1>
+                <p>Create your account and make a little more room for the things that matter.</p>
+            </div>
+            <p class="quote">"The next chapter starts here."</p>
+        </section>
+
+        <section class="form-panel">
+            <div class="form-content">
+                <p class="eyebrow">New account</p>
+                <h2>Create yours</h2>
+                <p class="subtext">It only takes a minute to get started.</p>
+                {% if error %}
+                    <p class="error">{{ error }}</p>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <label>
+                        Full name
+                        <input type="text" name="name" autocomplete="name" placeholder="Your name" required>
+                    </label>
+                    <label>
+                        Email address
+                        <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" autocomplete="new-password" placeholder="At least 8 characters" required>
+                    </label>
+                    <label>
+                        Confirm password
+                        <input type="password" name="password_confirmation" autocomplete="new-password" placeholder="Repeat your password" required>
+                    </label>
+                    <label class="terms">
+                        <input type="checkbox" name="terms" required>
+                        <span>I agree to the <a href="#">terms and conditions</a>.</span>
+                    </label>
+                    <button type="submit">Create account</button>
+                </form>
+                <p class="signin">Already have an account? <a href="/login/">Log in</a></p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
